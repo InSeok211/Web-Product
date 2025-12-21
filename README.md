@@ -1,86 +1,70 @@
-# MVC 기반 웹 게시판 시스템 (Web Board System)
-> **Java Servlet, JSP, H2 DB를 활용한 MVC 패턴 기반의 게시판 서비스**
+# MVC 패턴 기반 웹 게시판 시스템 (Web Board System)
+> **Java Servlet, JSP, H2 Database를 활용한 사용자/관리자 통합 게시판 서비스**
 
-본 프로젝트는 웹 프로그래밍의 핵심인 **MVC(Model-View-Controller) 아키텍처**를 이해하고, 데이터베이스와 연동된 동적 웹 애플리케이션을 구현하기 위해 제작되었습니다. 사용자 관리부터 게시글의 CRUD, 관리자 기능까지 포함된 통합 시스템입니다.
-
----
-
-## 주요 기능
-### 1. 회원 관리 (User Management)
-* **회원가입 및 로그인**: 사용자 가입 및 세션을 활용한 로그인 상태 유지.  
-* **회원 정보 수정/삭제**: 본인의 정보 수정 및 관리자에 의한 회원 관리 기능.
-
-### 2. 게시판 기능 (Board Features)
-* **게시글 CRUD**: 게시글 작성, 조회, 수정, 삭제 기능.
-* **첨부파일**: 게시글 작성 시 최대 3개의 파일 업로드 및 다운로드 지원.
-* **검색 및 페이징**: 제목/내용/작성자 기준 검색 및 10개 단위 페이징 처리.
-
-### 3. 보안 및 접근 제어 (Access Control)
-* **권한 관리**: 로그인한 사용자만 게시글 작성 가능.
-* **작성자 보호**: 본인이 작성한 글 또는 관리자만 수정/삭제 가능.
+본 프로젝트는 **MVC(Model-View-Controller) 아키텍처**를 실전 적용하여 데이터베이스 연동 및 비즈니스 로직 처리 과정을 구현한 웹 애플리케이션입니다. 사용자 계정 관리부터 게시글의 CRUD, 첨부파일 업로드 및 관리자 전용 제어 기능을 포함하고 있습니다.
 
 ---
 
 ## 서비스 흐름 및 화면 설계
-사용자의 이용 흐름을 고려하여 직관적인 UI/UX와 계층적인 메뉴 구조를 설계하였습니다.
+사용자의 이용 흐름과 시스템의 계층 구조를 한눈에 파악할 수 있도록 설계하였습니다.
 
-* **로그인(Login)**: 시스템 진입을 위한 인증 단계
-* **게시판(Board)**: 글쓰기, 검색, 상세 보기(수정/삭제/다운로드) 기능 제공
-* **회원 가입(Sign Up)**: 신규 사용자 등록 
-* **관리자(Admin)**: 게시판 및 회원 정보를 통합 관리하는 관리자 전용 메뉴
-<img width="546" height="306" alt="image" src="https://github.com/user-attachments/assets/aab3165a-6615-4c32-9259-44f3f4a0e5a6" />
+<img width="546" height="306" alt="image" src="https://github.com/user-attachments/assets/fd87e5b4-00e1-4b39-be6f-88cee1f68ede" />
+
+* **사용자(User)**: 로그인 후 게시글 작성, 조회, 검색 및 본인 정보 수정 가능
+* **관리자(Admin)**: 전체 회원 정보 및 게시글에 대한 강력한 관리 권한 보유
+* **기능적 계층**: UI(JSP) - 컨트롤러(Servlet) - 로직/DB(DAO)의 명확한 역할 분리
 
 ---
 
-## 🛠 기술 스택
-* **Backend**: Java 17, Jakarta Servlet, JDBC, DBCP (Database Connection Pool)
-* **Frontend**: JSP, JSTL, HTML5, CSS3, JavaScript
-* **Database**: H2 Database
-* **Server**: Apache Tomcat 10
+## 주요 기능
+### 1. 회원 및 인증 관리 (User & Auth)
+* **가입 및 로그인**: 사용자 가입 기능 및 세션 기반의 로그인 시스템 구축
+* **접근 제어**: 로그인한 사용자만 게시판 접근이 가능하며, 본인 게시물에 대한 수정/삭제 권한 부여
+* **회원 관리**: 관리자 전용 페이지를 통한 회원 정보 조회 및 강제 삭제 기능
   
----
-
-## 아키텍처 설계 (MVC Model)
-* **Model**: 데이터베이스 상호작용 및 비즈니스 로직 처리 (DO, DAO)
-* **View**: JSP를 이용한 사용자 인터페이스 제공
-* **Controller**: 사용자의 요청을 처리하고 흐름을 제어하는 Servlet
+### 2. 게시판 시스템 (Board System)
+* **게시글 CRUD**: 게시글의 작성, 목록 조회, 상세 보기, 수정, 삭제 기능 구현
+* **파일 업로드/다운로드**: 게시글 작성 시 최대 3개의 파일 첨부 지원 및 다운로드 서블릿 구현
+* **검색 및 페이징**: 제목, 내용, 작성자 기준 검색 기능과 10개 단위의 효율적인 페이징 처리
 
 ---
 
-## 데이터베이스 스키마
-프로젝트는 `User`, `Post`, `Attachment` 세 개의 테이블로 구성되어 있습니다.
-```sql
-CREATE TABLE "User" (
-    user_id VARCHAR(50) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    email VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE "Post" (
-    post_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    user_id VARCHAR(50),
-    FOREIGN KEY (user_id) REFERENCES "User"(user_id)
-);
-
-CREATE TABLE Attachment (
-    ATTACHMENT_ID INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    POST_ID INTEGER NOT NULL,
-    FILENAME VARCHAR(255) NOT NULL,
-    FILE_PATH VARCHAR(255) NOT NULL
-);
-```
+## 기술 스택
+* **Language**: Java 17, JSP, HTML5, CSS3, JavaScript
+* **Backend Framework**: Jakarta Servlet (MVC Pattern)
+* **Database**: H2 Database (In-memory/File)
+* **Library/API**: JSTL, Apache Tomcat 10, JDBC, DBCP (Database Connection Pool)
 
 ---
 
-## 실행 화면
-* **게시글 목록**
-<img width="546" height="116" alt="image" src="https://github.com/user-attachments/assets/c746a6a5-bfb6-4f41-b1d0-5a4db92322ac" />
+## 아키텍처 (MVC 모델)
+프로젝트는 역할 기반으로 폴더 구조를 체계화하였습니다.
+* **Model**: 데이터 처리 및 비즈니스 로직 (`com.wplab.service`)
+* **View**: 사용자 인터페이스 및 JSP 페이지 (`webapp`)
+* **Controller**: 요청 처리 및 흐름 제어 (`com.wplab.post`, `com.wplab.user`)
 
-* **글쓰기**
-<img width="546" height="215" alt="image" src="https://github.com/user-attachments/assets/31084141-a332-4755-b90f-2df839fca51a" />
+---
 
-* **관리자 회원 관리**
-<img width="546" height="85" alt="image" src="https://github.com/user-attachments/assets/a07ee022-761e-4a07-9be4-ae6e1f93dc07" />
+## 🖼️ 실행 화면 요약
 
+### [핵심 화면]
+1. **게시판 목록**: 페이징과 검색 바가 적용된 메인 화면
+<img width="546" height="116" alt="image" src="https://github.com/user-attachments/assets/f6f0f3fa-eb50-4974-9bb4-cc8950e03c35" />
+
+2. **게시글 상세보기**: 본인이 작성한 글일 경우 '수정/삭제' 버튼 노출 및 첨부파일 다운로드
+<img width="546" height="355" alt="image" src="https://github.com/user-attachments/assets/cb27d25d-3f73-4589-a7d3-5ecba4ff72ff" />
+
+
+<details>
+<summary>기타 실행 화면 보기 (로그인, 회원가입, 관리자 페이지 등)</summary>
+
+* **로그인 화면**: 사용자 인증 및 에러 메시지 처리
+<img width="247" height="225" alt="image" src="https://github.com/user-attachments/assets/6aa6d7f4-ba1c-4391-a06d-a8ec783b4002" />  
+
+* **관리자 회원 관리**: 전체 사용자 리스트 조회 및 관리 기능
+<img width="546" height="85" alt="image" src="https://github.com/user-attachments/assets/eb831f1e-713b-4c4b-be92-f6a6725ac64d" />  
+
+* **게시글 작성/수정**: 멀티파트 설정을 통한 파일 첨부 폼
+<img width="546" height="355" alt="image" src="https://github.com/user-attachments/assets/94bf620e-186c-41eb-af11-6e75a8e9a57b" />
+
+</details>
